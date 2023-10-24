@@ -528,9 +528,6 @@ def main():
     args.DIRECT = pproxy.DIRECT
     loop = asyncio.get_event_loop()
     sessions = {}
-    transport1, _ = loop.run_until_complete(loop.create_datagram_endpoint(lambda: IKE_500(args, sessions), ('0.0.0.0', 500)))
-    transport2, _ = loop.run_until_complete(loop.create_datagram_endpoint(lambda: SPE_4500(args, sessions), ('0.0.0.0', 4500)))
-    print('Serving on UDP :500 :4500...')
     if args.wireguard:
         transport3, _ = loop.run_until_complete(loop.create_datagram_endpoint(lambda: WIREGUARD(args), ('0.0.0.0', args.wireguard)))
         print(f'Serving on UDP :{args.wireguard} (WIREGUARD)...')
@@ -542,8 +539,6 @@ def main():
         print('exit')
     for task in asyncio.all_tasks(loop) if hasattr(asyncio, 'all_tasks') else asyncio.Task.all_tasks():
         task.cancel()
-    transport1.close()
-    transport2.close()
     if transport3:
         transport3.close()
     loop.run_until_complete(loop.shutdown_asyncgens())
